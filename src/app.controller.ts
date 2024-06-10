@@ -1,12 +1,13 @@
-//Used perplexity.ai to code this page
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 
-@Controller('api/hello-world')
+
+@Controller('api')
 export class AppController {
-  @Get()
+  @Get('hello-world')
   getHelloWorld(): string {
     return 'Hello world';
   }
-}
 
-//reminder to self: npm run start:dev
+ 
+}
+//reminder to self: use `npm start:dev'
