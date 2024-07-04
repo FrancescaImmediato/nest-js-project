@@ -1,24 +1,29 @@
-import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Post, HttpStatus, UseGuards, HttpException, UnauthorizedException, Req } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { UsersService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+
 
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('create')
-  async createUser(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
     try {
-      const { email, password } = createUserDto;
-      const userExists = await this.authService.userExists(email);
-      if (userExists) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ error: 'User account with email already exists.' });
-      }
-      await this.authService.createUser(email, password);
-      return res.status(HttpStatus.CREATED).send();
+      await this.authService.createUser(createUserDto.email, createUserDto.password);
+      return { message: 'User registered successfully', statusCode: HttpStatus.CREATED };
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error.' });
+      throw new HttpException('Registration failed', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  async login(@Req() req: Request) {
+    return this.authService.login(req.user);
   }
 }
