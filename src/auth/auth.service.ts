@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -41,6 +41,17 @@ export class AuthService {
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     console.log('Creating user:', createUserDto.email);
 
+    // ADDED: Check if passwords match
+    if (createUserDto.password !== createUserDto.confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    // ADDED: Check if user already exists
+    const existingUser = await this.usersService.findOne(createUserDto.email);
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists');
+    }
+
     const newUser = new User ();
 
     newUser.email = createUserDto.email;
@@ -52,6 +63,6 @@ export class AuthService {
     const createdUser = await this.usersService.createUser(newUser);
 
       console.log('User Created Successfully');
-      return this.usersService.createUser(newUser);
+      return createdUser;
   }
 }
