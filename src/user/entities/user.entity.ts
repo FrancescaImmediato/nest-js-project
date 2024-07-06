@@ -1,23 +1,22 @@
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
- import {Entity, Column, PrimaryGeneratedColumn, Timestamp} from 'typeorm';
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
- @Entity()
- export class User{
-   @PrimaryGeneratedColumn()
-   id: number;
+  @CreateDateColumn()
+  createdAt: Date;
 
-   @Column()
-   createdAt: string;
+  @Column()
+  firstName: string;
 
-   @Column()
-   firstName: string;
+  @Column()
+  lastName: string;
 
-   @Column()
-   lastName: string;
+  @Column({ unique: true })
+  email: string;
 
-   @Column()
-   email: string;
-
-   @Column()
-   hashedPassword: string;
- }
+  @Column()
+  password: string;
+}

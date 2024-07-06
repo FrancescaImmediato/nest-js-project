@@ -11,10 +11,11 @@ import { Request } from 'express';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     try {
-      await this.authService.createUser(createUserDto.email, createUserDto.password);
+      await this.authService.createUser(createUserDto);
       return { message: 'User registered successfully', statusCode: HttpStatus.CREATED };
     } catch (error) {
       throw new HttpException('Registration failed', HttpStatus.BAD_REQUEST);

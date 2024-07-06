@@ -3,6 +3,7 @@ import { UsersService } from '../user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -37,10 +38,20 @@ export class AuthService {
     };
   }
 
-  async createUser(email: string, password: string): Promise<void> {
-    console.log('Creating user:', email);
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await this.usersService.createUser({ email, password: hashedPassword });
-    console.log('User created successfully');
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    console.log('Creating user:', createUserDto.email);
+
+    const newUser = new User ();
+
+    newUser.email = createUserDto.email;
+    newUser.firstName = createUserDto.firstName;
+    newUser.lastName = createUserDto.lastName;
+
+    newUser.password = await bcrypt.hash(createUserDto.password, 10);
+
+    const createdUser = await this.usersService.createUser(newUser);
+
+      console.log('User Created Successfully');
+      return this.usersService.createUser(newUser);
   }
 }
